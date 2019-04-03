@@ -6,4 +6,4 @@ homework12
 
 ## Part 1
 
-![](./assets.giphy.gif)
+![](/assets.giphy.gif)
