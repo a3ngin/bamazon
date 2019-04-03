@@ -2,6 +2,7 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require('cli-table');
 
+var wholeTable;
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -21,14 +22,13 @@ connection.connect(function (err) {
     console.log("connected as id " + connection.threadId);
     afterConnection();
     // purchase();
-    // connection.end();
 });
 
 function afterConnection() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
 
-
+        wholeTable = res;
         var table = new Table({
             head: ["ID", "Name", "Department", "Price", "Quantity"]
             , colWidths: [20, 20, 20, 20, 20]
@@ -42,16 +42,16 @@ function afterConnection() {
             );
         }
         console.log(table.toString());
-        purchase()
+        purchase();
+
     });
 
-    
+
 }
 
 
 
 function purchase() {
-
     inquirer
         .prompt([
             {
@@ -68,18 +68,30 @@ function purchase() {
         ])
         .then(function (answer) {
 
-            connection.query("UPDATE products SET ? WHERE item_id?", answer.choice, function (err, res) {
-                for (var i = 0; i < res.length; i++) {
-                    if (answer.inventory < res[i].stock_quantity) {
-                        var updateStock = (res[i].stock_quantity.inventory - answer.inventory);
-                        var purchaseCom = (answer.choice);
-                        console.log(updateStock, purchaseCom);
-                    } else {
-                        console.log("There wasnt enough inventory... try again!");
-                        afterConnection();
-
-                    }
+            connection.query("SELECT * FROM products WHERE item_id = ? ", answer.choice, function (err, res) {
+                if (err) throw err;
+                if (answer.inventory > res[0].stock_quantity) {
+                    console.log("Insufficient Amount");
+                    connection.end()
+                } else {
+                    connection.query("UPDATE products set ? WHERE ?",
+                        [
+                            {
+                                stock_quantity: res[0].stock_quantity - answer.inventory
+                            },
+                            {
+                                item_id: answer.id
+                            }
+                        ],
+                        function (err) {
+                            if (err) throw err;
+                            console.log("hi");
+                            afterConnection();
+                        }
+                    )
                 }
-            });
-        });
-}
+            }
+            );
+        })
+    }
+
