@@ -20,13 +20,14 @@ connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     afterConnection();
-    connection.end();
+    // purchase();
+    // connection.end();
 });
 
 function afterConnection() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
-    
+
 
         var table = new Table({
             head: ["ID", "Name", "Department", "Price", "Quantity"]
@@ -41,29 +42,22 @@ function afterConnection() {
             );
         }
         console.log(table.toString());
-
+        purchase()
     });
+
+    
 }
 
 
 
-// table is an Array, so you can `push`, `unshift`, `splice` and friends
-
-
-// 6. The app should then prompt users with two messages.
-
-// * The first should ask them the ID of the product they would like to buy.
-// * The second message should ask how many units of the product they would like to buy.
-
-
 function purchase() {
-    // prompt for ID of item to be purchased and how many to be purchased
+
     inquirer
         .prompt([
             {
-                name: "productID",
+                name: "choice",
                 type: "input",
-                message: "What is the ID of the product you would like to purchase?"
+                message: "What is the item ID of the product you would like to purchase?"
             },
             {
                 name: "inventory",
@@ -73,21 +67,19 @@ function purchase() {
 
         ])
         .then(function (answer) {
-            // when finished prompting, insert a new item into the db with that info
-            connection.query(
-                "INSERT INTO table ?",
-                {
-                    item_name: answer.item,
-                    category: answer.category,
-                    starting_bid: answer.startingBid || 0,
-                    highest_bid: answer.startingBid || 0
-                },
-                function (err) {
-                    if (err) throw err;
-                    console.log("Your auction was created successfully!");
-                    // re-prompt the user for if they want to bid or post
-                    start();
+
+            connection.query("UPDATE products SET ? WHERE item_id?", answer.choice, function (err, res) {
+                for (var i = 0; i < res.length; i++) {
+                    if (answer.inventory < res[i].stock_quantity) {
+                        var updateStock = (res[i].stock_quantity.inventory - answer.inventory);
+                        var purchaseCom = (answer.choice);
+                        console.log(updateStock, purchaseCom);
+                    } else {
+                        console.log("There wasnt enough inventory... try again!");
+                        afterConnection();
+
+                    }
                 }
-            );
+            });
         });
 }
