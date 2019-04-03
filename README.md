@@ -9,7 +9,14 @@ Bamazon store front is an app that uses MySQL and Require which takes in orders 
 ## Part 1
 Shows table full of inventory & asks for item id and quantity user wants
 Then updates table with new inventory 
+
+
 OR
+
+
 Then alerts user there is an insufficient amount of inventory
+
+
+
 ![](https://media.giphy.com/media/MC2p4LiuelqK7E5Piw/giphy.gif)
 
