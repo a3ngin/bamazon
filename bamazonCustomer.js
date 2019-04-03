@@ -67,8 +67,11 @@ function purchase() {
 
         ])
         .then(function (answer) {
+            // console.log(answer.choice)
+            // console.log(answer.inventory)
 
-            connection.query("SELECT * FROM products WHERE item_id = ? ", answer.choice, function (err, res) {
+
+            connection.query("SELECT * FROM products WHERE item_id = ? ", [answer.choice], function (err, res) {
                 if (err) throw err;
                 if (answer.inventory > res[0].stock_quantity) {
                     console.log("Insufficient Amount");
@@ -80,17 +83,20 @@ function purchase() {
                                 stock_quantity: res[0].stock_quantity - answer.inventory
                             },
                             {
-                                item_id: answer.id
+                                item_id: answer.choice
                             }
                         ],
                         function (err) {
                             if (err) throw err;
-                            console.log("hi");
+                            // console.log("hey hey");
                             afterConnection();
+                            // connection.end()
                         }
                     )
                 }
+
             }
+
             );
         })
     }
