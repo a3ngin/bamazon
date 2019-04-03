@@ -6,4 +6,4 @@ homework12
 
 ## Part 1
 
-![](/assets.giphy.gif)
+![](https://media.giphy.com/media/bE3pSFWsGnmVOsE4Dj/giphy.gif)
